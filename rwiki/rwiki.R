@@ -1,7 +1,10 @@
 library(RCurl)
 library(XML)
 #iconv(title,from='UTF-8', to='GB2312')<[^<>]*>
-#keyword='Data_mining';lang='en'
+#####################
+#####获取wiki的一个词条下有连接的词条
+#####
+##keyword='Data_mining';lang='en'
 ##depth,连接深度
 wiki_get<-function(keyword='Data_mining',lang='en',depth=3){
   link<-c()
@@ -86,6 +89,5 @@ wiki_get<-function(keyword='Data_mining',lang='en',depth=3){
 link
 }
 
-dataming<-wiki_get(keyword='Data_mining',lang='en',depth=2)
-datamingzh<-wiki_get(keyword='数学',lang='zh',depth=2)
-#a<-c('http://www.acm.org/','/wiki/http://www.acm.org/')
+#dataming<-wiki_get(keyword='Data_mining',lang='en',depth=2)
+#datamingzh<-wiki_get(keyword='数学挖掘',lang='zh',depth=2)
