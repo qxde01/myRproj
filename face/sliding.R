@@ -81,9 +81,9 @@ sliding.merge<-function(x,y,m=8,n=8,type="RGB"){
       g_pat<-x[(1+m*n):(2*m*n),]
       b_pat<-x[(1+2*m*n):(3*m*n),]
       im<-array(0,dim=c(w,h,3))
-      im[,,1]<-.merge(x=r_pat,y=yy,m=m,n=n)
-      im[,,2]<-.merge(x=g_pat,y=yy,m=m,n=n)
-      im[,,3]<-.merge(x=b_pat,y=yy,m=m,n=n)
+      im[,,1]<-.merge(x=cbind(r_pat),y=yy,m=m,n=n)
+      im[,,2]<-.merge(x=cbind(g_pat),y=yy,m=m,n=n)
+      im[,,3]<-.merge(x=cbind(b_pat),y=yy,m=m,n=n)
       im<-as.Image(im)
       colorMode(im)<-2
     } 

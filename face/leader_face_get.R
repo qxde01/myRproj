@@ -77,3 +77,49 @@ for(i in 1:n){
   dev.off()
   file.remove('im.jpg')
 }
+
+##从图片中提取脸
+face.extract<-function(path='leader/',w=64,h=80){
+  files=dir(path,'.png')
+  n=length(files)
+  faces<-vector('list')
+  for(i in 1:n){
+    im<-readImage(paste0(path,files[i]))
+    im<-im[16:86,8:92,]
+    im<-resize(im,w=w,h=h)
+    faces[[i]]<-im
+  }
+  faces
+}
+leader.face<-face.extract(path='leader/',w=64,h=80)
+#str(leader.face)
+#leader.face[[5]]<-y
+display(combine(leader.face),method="raster",all=T)
+face_mat<-matrix(0,nrow=64*80*3,ncol=57)
+for(i in 1:57){
+  face_mat[,i]<-as.vector(image.sliding(leader.face[[i]],m=64,n=80))
+}
+#####计算几种统计脸：0.25分位数、平均、中值、
+#####                0.75分位数、标准差、中值绝对偏差
+face.mean0<-rowMeans(face_mat)
+face.median0<-apply(face_mat,1,median)
+face.qu250<-apply(face_mat,1,function(x){quantile(x,0.25)})
+face.qu750<-apply(face_mat,1,function(x){quantile(x,0.75)})
+face.sd0<-apply(face_mat,1,sd)
+face.mad0<-apply(face_mat,1,mad)
+y=leader.face[[1]]
+face.qu25<-sliding.merge(x=cbind(face.qu250),y=y,m=64,n=80)
+face.mean<-sliding.merge(x=cbind(face.mean0),y=y,m=64,n=80)
+face.median<-sliding.merge(x=cbind(face.median0),y=y,m=64,n=80)
+face.qu75<-sliding.merge(x=cbind(face.qu750),y=y,m=64,n=80)
+face.sd<-sliding.merge(x=cbind(face.sd0),y=y,m=64,n=80)
+face.mad<-sliding.merge(x=cbind(face.mad0),y=y,m=64,n=80)
+
+face.stat<-combine(face.qu25,face.mean,face.median,
+                   face.qu75,face.sd,face.mad)
+display(face.stat,method="raster",all=T)
+
+#x<-readImage('leader/105.png')
+#y<-x[16:86,10:98,];dim(y)
+#y<-resize(y,64,80)
+#display(face.mean0,method="raster")
