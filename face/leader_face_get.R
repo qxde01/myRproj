@@ -78,6 +78,9 @@ for(i in 1:n){
   dev.off()
   file.remove('im.jpg')
 }
+#####
+##对部分图片进行手工调整
+## 顺序调整，前三位：主席、总理、副主席
 
 ##从图片中提取脸
 face.extract<-function(path='leader/',w=64,h=80){

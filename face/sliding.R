@@ -57,6 +57,7 @@ image.sliding<-function(x,m=8,n=8,type="RGB"){
 #### display(raw2,method="raster")
 sliding.merge<-function(x,y,m=8,n=8,type="RGB"){
   .merge<-function(x,y,m=8,n=8){
+    
     n_col=ncol(x)
     w_w=ceiling(w/m);h_h=ceiling(h/n)
     #mat<-matrix(0,nrow=m*n,ncol=w_w*h_h)
@@ -73,6 +74,7 @@ sliding.merge<-function(x,y,m=8,n=8,type="RGB"){
   }
   w=nrow(y);h=ncol(y)
   yy=matrix(0,nrow=w,ncol=h)
+  x<-cbind(x)
   if(type=="RGB"|type=="rgb"){
     if(length(dim(y))<3)
       stop('This is not a RGB image !')
@@ -102,4 +104,16 @@ sliding.merge<-function(x,y,m=8,n=8,type="RGB"){
     }    
   }
   return(im)
+}
+
+####################################
+#### 矩阵每列为一幅图像，转化为图像list
+unit.image<-function(mat,m,n,type='RGB'){
+  nc=ncol(mat)
+  y=array(NA,dim=c(m,n,3))
+  unitface<-vector('list')
+  for(i in 1:nc){
+    unitface[[i]]<- sliding.merge(mat[,i],y=y,m=m,n=n,type=type)
+  }
+  unitface
 }
