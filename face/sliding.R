@@ -1,9 +1,13 @@
 library(EBImage)
-#setwd('E:/myRproj//trunk//face')
-
 #x=readImage('baby.jpg')
 #x=resize(x,480,448)
 #display(x,method="raster")
+rgb2grey<-function(x){
+  x<-0.3*x[,,1]+0.59*x[,,2]+0.11*x[,,3]
+  x<-as.Image(x)
+  colorMode(x)<-0
+  x
+}
 ######################################
 #### 将一副图片按从上到下、从左至右的顺序划分为m*n小块，
 #### 将小块转化为列向量，每一列代表一个小块
@@ -74,7 +78,7 @@ sliding.merge<-function(x,y,m=8,n=8,type="RGB"){
   }
   w=nrow(y);h=ncol(y)
   yy=matrix(0,nrow=w,ncol=h)
-  x<-cbind(x)
+  x<-cbind(as.matrix(x))
   if(type=="RGB"|type=="rgb"){
     if(length(dim(y))<3)
       stop('This is not a RGB image !')
