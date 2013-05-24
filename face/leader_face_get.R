@@ -14,11 +14,12 @@
 #http://www.cppcc.gov.cn/zxww/zxww/zx/index.shtml
 #http://www.cppcc.gov.cn/zxww/zxww/fzx/index.shtml
 #http://www.cppcc.gov.cn/zxww/zxww/msz/index.shtml
-source('sliding.R')
+source('sliding.R',encoding='utf-8')
+library(EBImage)
 library(RCurl)
 library(XML)
 library(jpeg)
-library(EBImage)
+
 strurl=c('http://www.gov.cn/test/2013-03/14/content_2353702.htm',
          'http://www.gov.cn/test/2013-03/14/content_2353936.htm',
          'http://www.gov.cn/test/2013-03/16/content_2355707.htm',
@@ -83,21 +84,26 @@ for(i in 1:n){
 ## 顺序调整，前三位：主席、总理、副主席
 
 ##从图片中提取脸
-face.extract<-function(path='leader/',w=64,h=80){
+face.extract<-function(path='leader/',w=48,h=64,type=1){
   files=dir(path,'.png')
   n=length(files)
   faces<-vector('list')
   for(i in 1:n){
     im<-readImage(paste0(path,files[i]))
-    im<-im[18:84,10:92,]
-    im<-resize(im,w=w,h=h)
+    if(type==1){
+      im<-im[18:84,10:92,]
+      im<-resize(im,w=w,h=h)
+    }
+    if(type==2)
+      im<-resize(im,w=w,h=h)
     faces[[i]]<-im
   }
   faces
 }
 leader.face<-face.extract(path='leader/',w=48,h=64)
-
-
+test.face<-face.extract(path='test/',w=48,h=64,type=2)
+display(combine(test.face),method="raster",all=T)
+save(test.face,file='test.face.rda')
 ##### 测试脸
 #testf<-dir('./test','.jpg')
 #nn=length(testf)
