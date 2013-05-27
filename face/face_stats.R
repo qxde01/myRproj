@@ -5,14 +5,21 @@ library(EBImage)
 #save(leader.face,file='leader.face.rda')
 #str(leader.face)
 load('leader.face.rda')
-png('faces.png',width=8*48,height=8*64)
-display(combine(leader.face),method="raster",all=T)
-dev.off()
+#png('faces.png',width=8*48,height=8*64)
+#display(combine(leader.face),method="raster",all=T)
+#dev.off()
 ######
-face_mat<-matrix(0,nrow=48*64*3,ncol=57)
-for(i in 1:57){
-  face_mat[,i]<-as.vector(image.sliding(leader.face[[i]],m=48,n=64))
+
+list2mat<-function(x){
+  n=length(x)
+  p=nrow(x[[1]]);q=ncol(x[[1]])
+  mat<-matrix(0,nrow=p*q*3,ncol=n)
+  for(i in 1:n){
+    mat[,i]<-as.vector(image.sliding(leader.face[[i]],m=p,n=q))
+  }
+  mat
 }
+face_mat<-list2mat(leader.face)
 #####计算几种统计脸：0.25分位数、平均、中值、
 #####                0.75分位数、标准差、中值绝对偏差
 face.mean<-rowMeans(face_mat)
@@ -22,17 +29,17 @@ face.qu75<-apply(face_mat,1,function(x){quantile(x,0.75)})
 face.sd<-apply(face_mat,1,sd)
 face.mad<-apply(face_mat,1,mad)
 y=leader.face[[1]]
-face.qu25<-sliding.merge(x=cbind(face.qu25),y=y,m=48,n=64)
-face.mean<-sliding.merge(x=cbind(face.mean),y=y,m=48,n=64)
-face.median<-sliding.merge(x=cbind(face.median),y=y,m=48,n=64)
-face.qu75<-sliding.merge(x=cbind(face.qu75),y=y,m=48,n=64)
-face.sd<-sliding.merge(x=cbind(face.sd),y=y,m=48,n=64)
-face.mad<-sliding.merge(x=cbind(face.mad),y=y,m=48,n=64)
+face.qu25<-sliding.merge(x=cbind(face.qu25),y=y,m=48,n=48)
+face.mean<-sliding.merge(x=cbind(face.mean),y=y,m=48,n=48)
+face.median<-sliding.merge(x=cbind(face.median),y=y,m=48,n=48)
+face.qu75<-sliding.merge(x=cbind(face.qu75),y=y,m=48,n=48)
+face.sd<-sliding.merge(x=cbind(face.sd),y=y,m=48,n=48)
+face.mad<-sliding.merge(x=cbind(face.mad),y=y,m=48,n=48)
 
 face.stat<-combine(face.qu25,face.mean,face.median,
                    face.qu75,face.sd,face.mad)
 
-png('stats_face.png',width=144,height=136)
+png('stats_face.png',width=48*3,height=48*2)
 display(face.stat,method="raster",all=T)
 dev.off()
 #######
@@ -67,6 +74,8 @@ plot(ms[,1],type='o',col=2,ylim=c(min(ms[,1:2]),max(ms[,1:2])),
 lines(ms[,2],type='o',col=3)
 text(which(ind==1),ms[ind==1,1],'主席',cex = 1.5)
 text(which(ind==2),ms[ind==2,1],'总理',cex = 1.5)
+text(which(ind==3),ms[ind==2,1],'副主席',cex = 1.5)
+text(which(ind==4),ms[ind==4,1],'委员长',cex = 1.5)
 legend('topleft',col=2:3,c('MSE','cosine'),pch = 1)
 #text(1.2,ms[1,2],'张宝文')
 #text(57,ms[57,2],'严隽琪')
@@ -77,6 +86,8 @@ plot(ms[,3],type='o',col=2,ylim=c(min(ms[,3:4]),max(ms[,3:4])),
 lines(ms[,4],type='o',col=3)
 text(which(ind==1),ms[ind==1,3],'主席',cex = 1.5)
 text(which(ind==2),ms[ind==2,4],'总理',cex = 1.5)
+text(which(ind==3),ms[ind==2,1],'副主席',cex = 1.5)
+text(which(ind==4),ms[ind==4,1],'委员长',cex = 1.5)
 legend('topleft',col=2:3,c('MSE','cosine'),pch = 1)
 #text(1,ms[1.2,3],'张宝文')
 #text(57,ms[57,4],'严隽琪')
@@ -84,7 +95,7 @@ dev.off()
 
 ################################
 #### 利用svd重建face
-svd.recon<-function(x){
+svd.recon<-function(x,k=4){
   n=length(x)
   high.face<-vector('list')
   lower.face<-vector('list')
@@ -99,8 +110,8 @@ svd.recon<-function(x){
     d<-s$d
     d1=d2=d
     ##最大的5个特征值重建
-    d1[6:p]=0
-    d2[1:5]=0
+    d1[(k+1):p]=0
+    d2[1:k]=0
     high<-Image(s$u %*% diag(d1) %*% t(s$v))
     lower<-Image(s$u %*% diag(d2) %*% t(s$v))
     high.face[[i]]<-high
@@ -114,7 +125,7 @@ svd.recon<-function(x){
        d=dd,error=error)
 }
 #######################
-rec<-svd.recon(x=leader.face)
+rec<-svd.recon(x=leader.face,k=2)
 ## 高频部分重建
 high.face=rec$high.face
 display(combine(high.face),method="raster",all=T)
@@ -136,11 +147,15 @@ par(mfrow=c(1,2),mar=c(2,4,2,0.5))
 plot(err,col=2,type='o',xlab='',ylab='误差平方和',main='SVD 重建误差')
 text(which(ind2==1),err[ind2==1],'主席',cex = 1.5)
 text(which(ind2==2),err[ind2==2],'总理',cex = 1.5)
+text(which(ind2==3),err[ind2==3],'副主席',cex = 1)
+text(which(ind2==4),err[ind2==4],'委员长',cex = 1)
 ####特征值散点图
 dc=rep(3,57);dc[1]=2;dc[2]=2
-plot(face.d[,1],face.d[,2],col=dc,main='灰度脸svd特征值散点图')
+plot(face.d[,1],face.d[,2],col=dc,main='灰度脸svd特征值散点图',ylab='')
 text(face.d[1,1],face.d[1,2],'主席',cex = 1.5)
 text(face.d[2,1],face.d[2,2],'总理',cex = 1.5)
+text(face.d[3,1],face.d[3,2],'副主席',cex = 1)
+text(face.d[4,1],face.d[4,2],'委员长',cex = 1)
 points(mean(face.d[,1]),mean(face.d[,2]),col=2,pch=3)
 #text(mean(face.d[,1]),mean(face.d[,2]),'中心')
 dev.off()
