@@ -14,7 +14,7 @@ rgb2grey<-function(x){
 #### pat<-image.sliding(x,m=16,n=16)
 #### patgrey<-image.sliding(x,m=16,n=16,type="grey")
 #image.sliding<-function(x,w_size=512,h_size=448,m=8,n=8,type="RGB"){
-image.sliding<-function(x,m=8,n=8,type="RGB"){
+image.sliding<-function(x,m=8,n=8,type="RGB",rnd=FALSE,samp=3000){
   .sliding<-function(x,m=8,n=8){
     w=nrow(x);h=ncol(x)
     w_w=ceiling(w/m);h_h=ceiling(h/n)
@@ -28,31 +28,53 @@ image.sliding<-function(x,m=8,n=8,type="RGB"){
       }
     }
     mat
-  }  
-  #x=resize(x,w_size,h_size)
-  if(length(dim(x))==3){
-    R=x[,,1]
-    G=x[,,2]
-    B=x[,,3]
-  }
-  if(type=="RGB"|type=="rgb"){
-    if(length(dim(x))<3)
-      stop('This is not a RGB image !')
-    R_pat<-.sliding(R,m=m,n=n)
-    G_pat<-.sliding(G,m=m,n=n)
-    B_pat<-.sliding(B,m=m,n=n) 
-    x_pat<-rbind(R_pat,G_pat,B_pat)
-  }
-  if(type=="grey"|type=="GREY"){
-    if(length(dim(x))<3)
-      x_pat<-.sliding(x,m=m,n=n)
-    if(length(dim(x))==3){
-      x=0.3*R+0.59*G+0.11*B
-      x_pat<-.sliding(x,m=m,n=n)
+  } 
+  
+  rnd.sliding<-function(x,m=8,n=8,samp=2000){
+    w=nrow(x);h=ncol(x)
+    ind1=sample(1:(w-m-1),samp,replace=T)
+    ind2=sample(1:(h-n-1),samp,replace=T)
+    ind<-unique(cbind(ind1,ind2))
+    nn=nrow(ind)
+    if(length(dim(x))<3)  
+      stop('Random sampling only support RGB 3-D array !')
+    mat<-matrix(0,nrow=m*n*3,ncol=nn)
+    for(i in 1:nn){ 
+      mat[,i]<-as.vector(x[ind[i,1]:(ind[i,1]+m-1),ind[i,2]:(ind[i,2]+n-1),])   
     }    
+    mat    
   }
- return(x_pat)   
-}
+  if(rnd==FALSE){
+    if(length(dim(x))==3){
+      R=x[,,1]
+      G=x[,,2]
+      B=x[,,3]
+    }
+    if(type=="RGB"|type=="rgb"){
+      if(length(dim(x))<3)
+        stop('This is not a RGB image !')
+      R_pat<-.sliding(R,m=m,n=n)
+      G_pat<-.sliding(G,m=m,n=n)
+      B_pat<-.sliding(B,m=m,n=n) 
+      x_pat<-rbind(R_pat,G_pat,B_pat)
+    }
+    if(type=="grey"|type=="GREY"){
+      if(length(dim(x))<3)
+        x_pat<-.sliding(x,m=m,n=n)
+      if(length(dim(x))==3){
+        x=0.3*R+0.59*G+0.11*B
+        x_pat<-.sliding(x,m=m,n=n)
+      }    
+    }
+    return(x_pat)   
+  }
+  if(rnd==TRUE){
+    x_pat<-rnd.sliding(x,m=m,n=n,samp=samp)
+    return(x_pat)
+  }
+  
+  }
+
 ####################################
 #### 将图像块合并成一幅图像
 #### raw<-sliding.merge(x=pat,y=x,m=16,n=16)

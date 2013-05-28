@@ -12,7 +12,7 @@ error.recon<-function(pre,rec){
   cat('error of sum :',sum(error),'\n')
   error
 }
-
+## k=20 pca 95%
 feat<-fastICA(face_mat,20)
 #face_col_mean<-apply(face_mat,2,mean)
 #face_col_sd<-apply(face_mat,2,sd)
@@ -44,12 +44,12 @@ dev.off()
 err<-error.recon(pre=pre_face,rec=ica_rec);sum(err)
 ind3=order(err);err<-err[ind3]
 #ec=as.integer(err*1000)+1
-png('ica_err.png',width=480,height=320)
+png('ica_err.png',width=640,height=320)
 par(mar=c(2,4,2,0.5))
 plot(err,type='o',col=as.integer(err*1000)+1,
      ylab='重建误差',main='ICA特征脸重建误差')
 text(which(ind3==1),err[ind3==1],'主席' ,col=2,cex=1.5)
-text(which(ind3==2),err[ind3==2],'总理' ,col=2,cex=1.5)
+text(which(ind3==2),err[ind3==2],'总理' ,col=2,cex=1)
 text(which(ind3==3),err[ind3==3],'副主席',cex = 1)
 text(which(ind3==4),err[ind3==4],'委员长',cex = 1)
 dev.off()
@@ -94,17 +94,29 @@ dev.off()
 
 
 ###################################
+
 test_svd<-svd.recon(x=test.face)
 test_d<-test_svd$d
 class=c(rep(1,nrow(face.d)),rep(2,nrow(test_d)))
 eid<-rbind(face.d,test_d)
 eid<-cbind(eid,class)
-plot(eid[,1],eid[,2],col=class+1)
+png('leader_test_svd.png',width=720,height=640)
+par(mar=c(4,4,2,0.5))
+plot(eid[,1],eid[,2],col=class+1,ylab='第二特征值',xlab='第一特征值',
+     main='57个训练脸和25个测试脸的特征值散点图')
 points(mean(face.d[,1]),mean(face.d[,2]),col=2,pch=3)
 points(mean(test_d[,1]),mean(test_d[,2]),col=3,pch=3)
-text(eid[1,1],eid[1,2],'主席',cex = 1.5)
-text(eid[2,1],eid[2,2],'总理',cex = 1.5)
+text(eid[1,1],eid[1,2],'主席',cex = 1.2)
+text(eid[2,1],eid[2,2],'总理',cex = 1.2)
 text(eid[3,1],eid[3,2],'副主席',cex = 1)
 text(eid[4,1],eid[4,2],'委员长',cex = 1)
+text(eid[58,1],eid[58,2],'薄熙来',cex = 1,col=3)
+text(eid[59,1],eid[59,2],'苍井空',cex = 1,col=4)
+text(eid[63,1],eid[63,2],'郭德纲',cex = 1,col=4)
+text(eid[70,1],eid[70,2],'马英九',cex = 1,col=3)
+text(eid[72,1],eid[72,2],'马云',cex = 1,col=6)
+text(eid[73,1],eid[73,2],'毛泽东',cex = 1,col=5)
 text(eid[74,1],eid[74,2],'奥巴马',cex = 1,col=3)
 text(eid[82,1],eid[82,2],'胡锦涛',cex = 1,col=5)
+text(eid[80,1],eid[80,2],'周鸿祎',cex = 1,col=6)
+dev.off()

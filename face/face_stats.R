@@ -15,7 +15,7 @@ list2mat<-function(x){
   p=nrow(x[[1]]);q=ncol(x[[1]])
   mat<-matrix(0,nrow=p*q*3,ncol=n)
   for(i in 1:n){
-    mat[,i]<-as.vector(image.sliding(leader.face[[i]],m=p,n=q))
+    mat[,i]<-as.vector(image.sliding(x[[i]],m=p,n=q))
   }
   mat
 }
