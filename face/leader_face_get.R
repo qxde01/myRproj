@@ -82,7 +82,7 @@ for(i in 1:n){
 #####
 ##对部分图片进行手工调整
 ## 顺序调整，前三位：主席、总理、副主席
-## 使用OpenCV检测脸，并提取，48X48
+## 使用OpenCV检测脸，并提取48X48的脸，见leader_face_get.py
 ##从图片中提取脸
 face.extract<-function(path='leader/',w=48,h=48){
   files=dir(path,'.png')
@@ -90,11 +90,6 @@ face.extract<-function(path='leader/',w=48,h=48){
   faces<-vector('list')
   for(i in 1:n){
     im<-readImage(paste0(path,files[i]))
-  #  if(type==1){
-  #    im<-im[18:84,10:92,]
-  #    im<-resize(im,w=w,h=h)
-  #  }
-  #  if(type==2)
     im<-resize(im,w=w,h=h)
     faces[[i]]<-im
   }
@@ -103,21 +98,21 @@ face.extract<-function(path='leader/',w=48,h=48){
 
 
 leader.face<-face.extract(path='leader_face/',w=48,h=48)
-png('leader.face.png',width=48*8,height=48*8)
+png('rpng/leader.face.png',width=48*8,height=48*8)
 display(combine(leader.face),method="raster",all=T)
 dev.off()
-save('leader.face',file='leader.face.rda')
+save(leader.face,file='rdata/leader.face.rda')
 
 
 test.face<-face.extract(path='test/',w=48,h=48)
-png('test.face.png',width=48*5,height=48*5)
+png('rpng/test.face.png',width=48*5,height=48*5)
 display(combine(test.face),method="raster",all=T)
 dev.off()
-save(test.face,file='test.face.rda')
+save(test.face,file='rdata/test.face.rda')
 
 
-head<-face.extract(path='leader/',w=96,h=128,type=2)
-png('head.png',width=96*8,height=128*8)
+head<-face.extract(path='leader/',w=96,h=128)
+png('rpng/head.png',width=96*8,height=128*8)
 display(combine(head),method="raster",all=T)
 dev.off()
 
