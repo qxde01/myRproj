@@ -11,7 +11,7 @@ for i in range(0,len(files)):
     gray=cv2.equalizeHist(gray)
     #gray=cv2.resize(gray,(96,128))
     rects=cascade.detectMultiScale(image,scaleFactor=1.115,minNeighbors=8,minSize=(4,4))
-    print rects
+    #print rects
     x=rects[0][0]
     y=rects[0][1]
     width=rects[0][2]
