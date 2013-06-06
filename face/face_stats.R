@@ -1,27 +1,10 @@
 #setwd('E:/myRproj//trunk/face')
 source('sliding.R',encoding='utf-8')
 library(EBImage)
-#leader.face<-face.extract(path='leader/',w=48,h=64)
-#save(leader.face,file='leader.face.rda')
-#str(leader.face)
-load('leader.face.rda')
-#png('faces.png',width=8*48,height=8*64)
-#display(combine(leader.face),method="raster",all=T)
-#dev.off()
-######
 
-list2mat<-function(x){
-  n=length(x)
-  p=nrow(x[[1]]);q=ncol(x[[1]])
-  mat<-matrix(0,nrow=p*q*3,ncol=n)
-  for(i in 1:n){
-    mat[,i]<-as.vector(image.sliding(x[[i]],m=p,n=q))
-  }
-  mat
-}
 load('rdata/leader.face.rda')
 face_mat<-list2mat(leader.face)
-save(face_mat,file='rdata/face_mat.rda')
+#save(face_mat,file='rdata/face_mat.rda')
 #####计算几种统计脸：0.25分位数、平均、中值、
 #####                0.75分位数、标准差、中值绝对偏差
 face.mean<-rowMeans(face_mat)
@@ -129,7 +112,9 @@ svd.recon<-function(x,k=4){
        d=dd,error=error)
 }
 #######################
-rec<-svd.recon(x=leader.face,k=3)
+rec<-svd.recon(x=leader.face,k=2)
+grey.face<-rec$grey.face
+#save(grey.face,file='rdata/leader_grey_face.rda')
 ## 高秩部分重建
 high.face=rec$high.face
 display(combine(high.face),method="raster",all=T)

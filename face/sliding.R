@@ -106,6 +106,7 @@ sliding.merge<-function(x,y,m=8,n=8,type="RGB"){
         k=k+1
       }
     }
+
     y
   }
   w=nrow(y);h=ncol(y)
@@ -148,8 +149,30 @@ unit.image<-function(mat,m,n,type='RGB'){
   nc=ncol(mat)
   y=array(NA,dim=c(m,n,3))
   unitface<-vector('list')
+  if(type=='grey'|type=='GREY')
+    y=matrix(NA,nrow=m,ncol=n)
   for(i in 1:nc){
     unitface[[i]]<- sliding.merge(mat[,i],y=y,m=m,n=n,type=type)
   }
   unitface
+}
+
+###############################
+#### 将由Image组成的list转化为列矩阵
+list2mat<-function(x){
+  n=length(x)
+  p=nrow(x[[1]]);q=ncol(x[[1]])
+  if(length(dim(x[[1]]))==3){
+    mat<-matrix(0,nrow=p*q*3,ncol=n)
+    for(i in 1:n){
+      mat[,i]<-as.vector(image.sliding(x[[i]],m=p,n=q))
+    }
+  }
+  if(length(dim(x[[1]]))==2){
+    mat<-matrix(0,nrow=p*q,ncol=n)
+    for(i in 1:n){
+      mat[,i]<-as.vector(image.sliding(x[[i]],m=p,n=q))
+    }
+  }
+  mat
 }

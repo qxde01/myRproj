@@ -48,7 +48,7 @@ ind3=order(ica_rec_err);ica_rec_err<-ica_rec_err[ind3]
 #ec=as.integer(err*1000)+1
 png('rpng/ica_leader_recon_error.png',width=640,height=320)
 par(mar=c(2,4,2,0.5))
-plot(ica_rec_err,type='o',col=as.integer(err*1000)+1,
+plot(ica_rec_err,type='o',col=as.integer(ica_rec_err*1000)+1,
      ylab='ICA重建误差',main='ICA特征脸重建误差')
 text(which(ind3==1),ica_rec_err[ind3==1],'主席' ,col=2,cex=1.5)
 text(which(ind3==2),ica_rec_err[ind3==2],'总理' ,col=2,cex=1)
@@ -105,7 +105,7 @@ test.eigen<-test_svd$d
 class=c(rep(1,nrow(leader.eigen)),rep(2,nrow(test.eigen)))
 eigen<-rbind(leader.eigen,test.eigen)
 #eid<-cbind(eid,class)
-png('rpng/leader_test_svd_eigen.png',width=720,height=640)
+png('rpng/leader_test_svd_eigen.png',width=680,height=600)
 par(mar=c(4,4,2,0.5))
 plot(eigen[,1],eigen[,2],col=class+1,ylab='第二特征值',xlab='第一特征值',
      main='57个训练脸和25个测试脸的特征值散点图')
@@ -119,8 +119,8 @@ text(eigen[58,1],eigen[58,2],'薄熙来',cex = 1,col=3)
 text(eigen[59,1],eigen[59,2],'苍井空',cex = 1,col=4)
 text(eigen[63,1],eigen[63,2],'郭德纲',cex = 1,col=4)
 text(eigen[70,1],eigen[70,2],'马英九',cex = 1,col=3)
-text(eigen[72,1],eigen[72,2],'马云',cex = 1,col=6)
-text(eigen[73,1],eigen[73,2],'毛泽东',cex = 1,col=5)
+text(eigen[71,1],eigen[71,2],'马云',cex = 1,col=6)
+text(eigen[72,1],eigen[72,2],'毛泽东',cex = 1,col=5)
 text(eigen[74,1],eigen[74,2],'奥巴马',cex = 1,col=3)
 text(eigen[82,1],eigen[82,2],'胡锦涛',cex = 1,col=5)
 text(eigen[80,1],eigen[80,2],'周鸿祎',cex = 1,col=6)
