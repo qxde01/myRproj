@@ -28,12 +28,15 @@ image.batch<-function(xlist,m=8,n=8,samp=1000,rnd=TRUE){
 raw.recon<-function(D,xlist,y=array(0,dim=c(48,48,3)),m=8,n=8){
   nn=length(xlist)
   raw<-vector('list')
+  alpha<-c()
   for(i in 1:nn){
     a=spams.omp(X=xlist[[i]],D=D,lambda1=0.15)
+    #cat(dim(a),'\n')
+    alpha<-rbind(alpha,as.vector(a))
     recx<-D%*%a
     raw[[i]]<-sliding.merge(recx,y=y,m,n)
   }
-  raw
+  list(raw=raw,alpha=alpha)
 }
 m=4;n=4
 X=image.batch(x=leader.face,m=m,n=n,samp=1500)
@@ -55,8 +58,9 @@ all_slide<-image.batch(x=all.face,m=m,n=n,rnd=F)
 ## 用字典D重建测试图像
 rec.all.face<-raw.recon(D=nnsc_D,xlist=all_slide,
                     y=array(0,dim=c(48,48,3)),m=m,n=n)
+
 png('rpng/all_rec_nnsc.png',width=48*10,height=48*9)
-display(combine(rec.all.face),method="raster",all=T)
+display(combine(rec.all.face$raw),method="raster",all=T)
 dev.off()
 ###########################
 ## 使用字典D重建的均方误差
@@ -72,7 +76,7 @@ DLrec.error<-function(x,y){
   mse  
 }
 
-dlerr<-DLrec.error(x=all.face,y=rec.all.face)
+dlerr<-DLrec.error(x=all.face,y=rec.all.face$raw)
 indx<-order(dlerr) 
 dlerr<-dlerr[indx]
 cl=indx;cl[cl<58]=2;cl[cl>57]=3
@@ -102,6 +106,25 @@ text(which(indx==74),dlerr[indx==74]+s,'奥巴马',cex = 1,col=3)
 text(which(indx==77),dlerr[indx==77],'章子怡',cex = 1,col=3)
 text(which(indx==82),dlerr[indx==82]+1.5*s,'胡锦涛',cex = 1,col=2)
 text(which(indx==80),dlerr[indx==80]-s,'周鸿祎',cex = 1,col=3)
+dev.off()
+
+#### 稀疏稀疏alpha,K=128
+nnsc_D<-spams.nnsc(X=X,K=128,lambda1=0.05)
+rec.all.face<-raw.recon(D=nnsc_D,xlist=all_slide,
+                        y=array(0,dim=c(48,48,3)),m=m,n=n)
+alpha=rec.all.face$alpha
+cs=apply(abs(alpha),2,sum)
+#### 去掉全为0的列
+alpha2=alpha[,cs>0]
+library(reshape)
+alpha2=rescaler(alpha2,'range')
+row.names(alpha2)[58:82]<-test.name
+row.names(alpha2)[1:4]<-c('主席','总理','副主席','委员长')
+dd<-dist(alpha2)
+hc=hclust(dist(alpha2),method='ward')
+png('rpng/hclust.png',width=720,height=480)
+plot(hc,col=4, main="使用NNSC稀疏系数层次聚类",ylab='',xlab='',sub='')
+rect.hclust(hc,k=14, border = 2)
 dev.off()
 
 ## 每幅图片顺序分割
