@@ -20,8 +20,8 @@ remove.chars<-function(x,n=1,pattern='[0-9]'){
 df2dtm<-function(df,content='word',word.min=2){
   df <- data.frame(contents = as.character(df[,content]), 
                    heading = as.character(df$title), 
-                   id = as.character(df$author_url), 
-                   origin=as.character(df$review_url),
+                   id = as.character(df$author_uri), 
+                   origin=as.character(df$review_uri),
                    stringsAsFactors = F)
   m <- list(Content = "contents",
             Heading = "heading",
@@ -43,7 +43,7 @@ lda.rep<-function(train,test=NULL,n=5,method='VEM'){
   n=2:n
   for(i in n){
     cat('---------------- k=',i,' --------------\n')
-    model[[i-1]]<-LDA(train, control = list(verbose=1),method, k = i)
+    model[[i-1]]<-LDA(train, control = list(verbose=0),method, k = i)
     train_perp[i]<-perplexity(model[[i-1]])
     if(!is.null(test)){
       test_perp[i]<-perplexity(model[[i-1]],newdata=test)
@@ -123,21 +123,22 @@ prop2df<-function(lda,newdata=NULL,terms.top.num=6,doc.num=8){
 }
 ##########################################################################
 #### Document-Topic 权重分布图
-topic.image<-function(topic,main=NULL,by=50){
+topic.image<-function(topic,main=NULL,by=10){
   #topic<-t(posterior(lda)$topics)
   topic=t(topic)
   nc=nrow(topic);nr=ncol(topic)
-  W=1-topic/max(topic)
+  w=as.integer(as.factor(topic))
+  w=w/max(w) 
+  by<-floor(nr/by)
   op<-par(xpd=TRUE, mar=c(5.1,4.1,2.1,2))
-  image(topic,col=gray(W),xaxt="n", yaxt="n",
+  image(topic,col=gray(w),xaxt="n", yaxt="n",
         ylab='Document',xlab='Topic',font.lab=3,
         main=paste(main,"Topic-Document Weights" ))
   axis(side=1, at=(1:nc)/nc-1/(2*nc), 
        labels=paste('Topic',1:nc), tick=F ,line=-.5)
-  axis(2, at =seq(0,nr,by=by)/nr,label=seq(0,nr,by=50))
+  axis(2, at=seq(0,nr,by=by)/nr,label=seq(0,nr,by=by))
   par(op)
 }
-
 
 ####################################
 #### 合并同一主题的词频

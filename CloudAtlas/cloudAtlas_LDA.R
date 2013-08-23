@@ -1,13 +1,13 @@
 setwd('E:/myRproj/trunk/CloudAtlas/')
-load('rda/cloudAtlas.rda')
+load('rda/cloudAtlas500.rda')
 source('postProcess.R',encoding="UTF-8")
 #去掉一些字符a-z0-9
-cloudAtlas$word=sapply(cloudAtlas$word,remove.chars,n=1,"[0-9a-zA-Z\\.%\\']|—|云图|-")
+cloudAtlas500$word=sapply(cloudAtlas500$word,remove.chars,n=1,"[0-9a-zA-Z\\.%\\']|—|云图|-")
 #cloudAtlas$wordPositive=sapply(cloudAtlas$wordPos,remove.chars,n=1,"[—0-9a-z\\.%\\-\\']")
 #cloudAtlas$wordNegative=sapply(cloudAtlas$wordNeg,remove.chars,n=1,"[—0-9a-z\\.%\\-\\']")
 ####有效346+149=495 篇
-train_dtm<-df2dtm(cloudAtlas[1:350,],content='word',word.min=2)
-test_dtm<-df2dtm(cloudAtlas[351:500,],content='word',word.min=2)
+train_dtm<-df2dtm(cloudAtlas500[1:350,],content='word',word.min=2)
+test_dtm<-df2dtm(cloudAtlas500[351:500,],content='word',word.min=2)
 t1<-colnames(train_dtm);t2<-colnames(test_dtm)
 table(t1 %in% t2);length(table(c(t1,t2)))
 dim(train_dtm);dim(test_dtm)
