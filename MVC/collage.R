@@ -4,15 +4,15 @@ library(compiler)
 cmpfile("mvc.R")
 loadcmp("mvc.Rc")
 #############################################
-bg=readImage("b01.jpg")
+bg=readImage("images/b01.jpg")
 bg<-resize(bg,800,600)
-dog=readImage("dog.jpg");dim(dog)
+dog=readImage("images/dog.jpg");dim(dog)
 x0=610;y0=10;w=120;h=90
 dog<-resize(dog,w,h)
 bgdog=bg[x0:(x0+w-1),y0:(y0+h-1),]
 bg[x0:(x0+w-1),y0:(y0+h-1),]=Collage(dog,bgdog,k=8)
 ############################################
-girl=readImage('girl.jpg')
+girl=readImage('images/girl.jpg')
 x0=50;y0=180;w=80;h=200
 girl<-resize(girl,w,h)
 bg[x0:(x0+w-1),y0:(y0+h-1),]=Collage(girl,bg[x0:(x0+w-1),y0:(y0+h-1),],k=5)
@@ -23,5 +23,5 @@ x0=210;y0=2
 result4=Collage(girl,bg[x0:(x0+w-1),y0:(y0+h-1),],k=15)
 bg[x0:(x0+w-1),y0:(y0+h-1),]=result4
 display(bg,method="raster")
-writeImage(bg,'res.jpg')
+writeImage(bg,'images/res.png')
 
