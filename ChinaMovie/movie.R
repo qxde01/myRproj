@@ -225,7 +225,11 @@ legend("topleft", lty = 1, xjust = 1, yjust = 1,col=1:2,
 dev.off()
 ##########################################################
 duration<-movie$duration
-
+duration=duration[!is.na(duration)]
+duration=unlist(strsplit(duration,','))
+duration<-as.numeric(duration)
+duration=duration[duration<200]
+hist(duration)
 #######################################################################
 ## 标签
 library("RJSONIO")
